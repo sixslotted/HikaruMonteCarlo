@@ -30,22 +30,22 @@ for index,url in enumerate(reversed(datajson['archives'])):
     if index == 11:
         break
 
-def simulate (gameSet):
+def Simulate (gameSet):
     winRecord = []
     for game in gameSet:
         if game['white']['username']=='Hikaru':
-            winChance = glickoCalculateWinChance(game['white']['rating'], game['black']['rating'])
+            winChance = GlickoCalculateWinChance(game['white']['rating'], game['black']['rating'])
             if random.uniform(0,1)<winChance:
                 winRecord.append('win')
             else:
                 winRecord.append('lose')
         else:
-            winChance = glickoCalculateWinChance(game['black']['rating'], game['white']['rating'])
+            winChance = GlickoCalculateWinChance(game['black']['rating'], game['white']['rating'])
             if random.uniform(0,1)<winChance:
                 winRecord.append('win')
             else:
                 winRecord.append('lose')
     return winRecord
 
-def glickoCalculateWinChance(rating1,rating2):
+def GlickoCalculateWinChance(rating1,rating2):
     return 1/(1+10**-((rating1-rating2)/400))
