@@ -10,6 +10,7 @@ import chess
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+from numpy.polynomial import Polynomial as poly
 
 def CalculateDrawChance (gameSet):
     winDrawDistribution = []
@@ -17,17 +18,28 @@ def CalculateDrawChance (gameSet):
     for game in gameSet:
         ratingDifference = abs(game['white']['rating']-game['black']['rating'])
         while (ratingDifference - maxDifference >= 0):
-            maxDifference +=10
+            maxDifference +=30
             winDrawDistribution.append([maxDifference,0,0,0])
         if game['white']['result']=='win' or game['black']['result']=='win':
-            winDrawDistribution[ratingDifference // 10 ][1]+=1
+            winDrawDistribution[ratingDifference // 30 ][1]+=1
         else:
-            winDrawDistribution[ratingDifference // 10 ][2]+=1
-    for interval in winDrawDistribution:
-        if interval[2] + interval [1] > 0:
-            interval[3]=interval[1]/(interval[1]+interval[2])
+            winDrawDistribution[ratingDifference // 30 ][2]+=1
+    firstIntervalNoDrawsOrNoWins=0
+    for i, interval in enumerate(winDrawDistribution):
+        if interval[1]==0:
+            firstIntervalNoDrawsOrNoWins = i
+            break
+        interval[3]=interval[1]/(interval[1]+interval[2])
+        if interval[2]==0:
+            firstIntervalNoDrawsOrNoWins = i+1
+            break
+    winDrawDistribution = winDrawDistribution[:firstIntervalNoDrawsOrNoWins]
     arrayFormat = np.array(winDrawDistribution)
-    plt.plot(arrayFormat[0,:])
+    plt.plot(arrayFormat[:,0], arrayFormat[:,3])
+    bestFit = poly.fit(arrayFormat[:,0], arrayFormat[:,3], 2)
+    print(bestFit)
+    x_poly, y_poly = bestFit.linspace()
+    plt.plot(x_poly, y_poly)
     plt.show()
     return winDrawDistribution
 
